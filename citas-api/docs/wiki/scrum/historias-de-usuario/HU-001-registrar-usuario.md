@@ -3,53 +3,48 @@ id: HU-001
 tipo: historia-de-usuario
 titulo: Registrar usuario
 estado: Pendiente de aprobación
-epica: "[[EP-001-acceso-de-usuarios]]"
+epica: "[[EP-001-acceso-y-perfil]]"
 esfuerzo: Medio
 sprint_sugerido: S2
 dependencias: []
-relacionadas:
-  - "[[HU-002-gestionar-sesion]]"
-  - "[[HU-003-interfaz-de-acceso]]"
+relacionadas: ["[[HU-002-gestionar-sesion]]", "[[HU-003-interfaz-de-acceso]]"]
 ---
 
 # HU-001 — Registrar usuario
 
-**COMO** visitante ficticio, **QUIERO** registrar mi cuenta, **PARA** acceder como paciente al sistema.
+## Historia de usuario
+**COMO** visitante ficticio **QUIERO** crear una cuenta USER **PARA** acceder al sistema de citas.
 
-## Contexto y alcance
-PRD RF-01. Capturar nombres, apellidos, tipo/número de documento, email, teléfono y contraseña. Persistencia MySQL y migración inicial. No incluye afiliación ni recuperación de contraseña.
-
-## Reglas de negocio
-Email y documento únicos. Normalizar email; almacenar exclusivamente hash de contraseña. Asignar USER desde el servidor, sin admitir escalamiento por datos del cliente.
+## Contexto, alcance y reglas
+PRD RF-01; RN de seguridad. Captura nombres, apellidos, documento, email, teléfono y contraseña. Email y documento son únicos (email normalizado); servidor asigna solo USER y persiste hash adaptativo. Excluye afiliación y cuentas ADMIN/PROFESSIONAL.
 
 ## Dependencias y relaciones
-Épica [[EP-001-acceso-de-usuarios]]. Habilita [[HU-002-gestionar-sesion]] y [[HU-003-interfaz-de-acceso]].
+- Épica: [[EP-001-acceso-y-perfil]]. Habilita [[HU-002-gestionar-sesion]] y [[HU-003-interfaz-de-acceso]].
 
 ## Esfuerzo
-Medio: coordina validación, caso de uso y persistencia.
+**Nivel:** Medio. Coordinación de validación, identidad y esquema inicial 3FN.
 
-## Tareas
-- [ ] T-01 (Medio): modelar usuarios, roles y migración Flyway en 3FN.
-- [ ] T-02 (Medio): implementar registro, validación y hash adaptativo.
-- [ ] T-03 (Medio): verificar persistencia, duplicados y rol del usuario registrado.
+## Tareas de desarrollo
+- [ ] **T-01 — Modelo de identidad y migración.** Justificar PK, únicos y dependencias funcionales; crear migración Flyway.
+- [ ] **T-02 — Registro seguro.** Aplicar caso de uso, validación y hash sin exponer secretos.
+- [ ] **T-03 — Contrato y pruebas.** Cubrir alta válida, duplicados y escalamiento de rol.
 
 ## Criterios de aceptación
-- CA-01: con datos válidos, el registro responde 201 con identificador y rol USER, sin contraseña ni hash.
-- CA-02: email repetido, incluso con diferencias de mayúsculas, o documento repetido responde 409 sin crear otra cuenta.
-- CA-03: campos obligatorios vacíos, email inválido o contraseña fuera de límites documentados responde 400.
-- CA-04: una petición que intente asignar ADMIN no crea una cuenta privilegiada.
+- **CA-01:** Dado un formulario válido, cuando se registra, entonces se crea USER y se devuelve identificador sin contraseña ni hash.
+- **CA-02:** Dado email (sin distinguir mayúsculas) o documento existente, cuando se registra, entonces responde conflicto y no crea otra cuenta.
+- **CA-03:** Dado dato obligatorio, email o contraseña inválidos, cuando se registra, entonces responde error de validación identificable.
+- **CA-04:** Dado un rol privilegiado enviado por cliente, cuando se registra, entonces la cuenta no adquiere privilegios.
 
 ## Definition of Done
-- [ ] CA-01 a CA-04 verificados con evidencia.
-- [ ] Migración inicial ejecutada en MySQL; esquema justificado en 3FN.
-- [ ] Contraseña persistida como hash BCrypt; no aparece en respuestas ni logs.
-- [ ] Contrato y trazabilidad actualizados.
+- [ ] CA-01 a CA-04 tienen evidencia automatizada o de integración.
+- [ ] Esquema y migración preservan 3FN; hash y secretos no aparecen en respuesta ni logs.
+- [ ] Contrato REST, consumidor web y trazabilidad Scrum quedan coherentes.
 
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia |
 |---|---|---|
-| CA-01 a CA-04 | Pendiente | Sin ejecución al redactar |
-| DoD | Pendiente | Requiere implementación y comprobación |
+| CA-01 a CA-04 | Pendiente | Requiere implementación aprobada. |
+| DoD | Pendiente | Sin validación ejecutada. |
 
-## Historial
-S2: propuesta pendiente de aprobación del usuario.
+## Notas y fuentes
+PRD RF-01; restricciones de seguridad y BD; requisitos 1FN–3FN. Verificado: 2026-09-17.

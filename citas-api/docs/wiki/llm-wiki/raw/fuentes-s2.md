@@ -1,6 +1,6 @@
 # Fuentes iniciales — 2026-09-16
 
-Registro de referencias; no sustituye documentos originales.
+Registro de referencias; no sustituye documentos originales. La procedencia y el estado de cada fuente se mantienen en el [manifiesto RAW](manifest.md).
 
 - Workspace `README.md`: contexto académico y dos repositorios.
 - `PRD.md` v1: RF-01 registro, RF-02 sesión JWT y alcance futuro.
@@ -10,3 +10,5 @@ Registro de referencias; no sustituye documentos originales.
 - `EVIDENCIAS_Y_TRAZABILIDAD.md`: commits por sesión, ramas y resultados comprobables.
 
 Solicitud del usuario: desarrollar los puntos S2 bajo el contexto del proyecto. No registra aprobación individual de historias ni aceptación visual.
+
+Este inventario es una guía de INGEST, no una fuente normativa adicional. Los documentos originales se conservan en sus rutas versionadas del workspace; cuando se requiera un snapshot RAW se añadirá una nueva entrada con hash al manifiesto.
