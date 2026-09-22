@@ -1,0 +1,172 @@
+erDiagram
+    ROLES ||--o{ USER_ROLES : assigns
+    USERS ||--o{ USER_ROLES : has
+    USERS ||--o{ REFRESH_TOKENS : owns
+    USERS ||--o{ PASSWORD_RESET_TOKENS : requests
+
+    INSURANCE_REGIMES ||--o{ EPS_PLANS : classifies
+    EPS ||--o{ EPS_PLANS : offers
+    USERS ||--o{ USER_INSURANCE_AFFILIATIONS : has
+    EPS_PLANS ||--o{ USER_INSURANCE_AFFILIATIONS : selected
+
+    USERS ||--o| PROFESSIONALS : profile
+    PROFESSIONALS ||--o{ PROFESSIONAL_SPECIALTIES : has
+    SPECIALTIES ||--o{ PROFESSIONAL_SPECIALTIES : assigned
+    PROFESSIONALS ||--o{ PROFESSIONAL_LOCATIONS : works_at
+    LOCATIONS ||--o{ PROFESSIONAL_LOCATIONS : hosts
+
+    USERS ||--o{ APPOINTMENTS : patient
+    PROFESSIONALS ||--o{ APPOINTMENTS : attends
+    LOCATIONS ||--o{ APPOINTMENTS : occurs_at
+    SPECIALTIES ||--o{ APPOINTMENTS : category
+    USER_INSURANCE_AFFILIATIONS ||--o{ APPOINTMENTS : covers
+    APPOINTMENT_STATUSES ||--o{ APPOINTMENTS : current_status
+
+    PROFESSIONALS ||--o{ AVAILABILITY_BLOCKS : defines
+    LOCATIONS ||--o{ AVAILABILITY_BLOCKS : located_at
+    AVAILABILITY_BLOCKS ||--o{ PROFESSIONAL_SLOTS : expands_to
+    APPOINTMENTS o|--o{ PROFESSIONAL_SLOTS : reserves
+
+    APPOINTMENTS ||--o{ APPOINTMENT_STATUS_HISTORY : history
+    APPOINTMENT_STATUSES ||--o{ APPOINTMENT_STATUS_HISTORY : records
+    USERS ||--o{ APPOINTMENT_STATUS_HISTORY : changes
+
+    APPOINTMENTS ||--o{ RESCHEDULE_REQUESTS : receives
+    USERS ||--o{ RESCHEDULE_REQUESTS : requests
+    LOCATIONS ||--o{ RESCHEDULE_REQUESTS : requested_at
+    RESCHEDULE_REQUEST_STATUSES ||--o{ RESCHEDULE_REQUESTS : state
+
+    USERS {
+      BIGINT id PK
+      VARCHAR email UK
+      VARCHAR document_number
+      VARCHAR password_hash
+      BOOLEAN active
+    }
+    ROLES {
+      SMALLINT id PK
+      VARCHAR code UK
+    }
+    USER_ROLES {
+      BIGINT user_id PK_FK
+      SMALLINT role_id PK_FK
+    }
+    PROFESSIONALS {
+      BIGINT id PK
+      BIGINT user_id UK_FK
+      VARCHAR professional_code UK
+      VARCHAR license_number UK
+    }
+    SPECIALTIES {
+      SMALLINT id PK
+      VARCHAR code UK
+      SMALLINT appointment_duration_minutes
+      BOOLEAN is_general
+      BOOLEAN requires_admin_approval
+    }
+    LOCATIONS {
+      SMALLINT id PK
+      VARCHAR code UK
+      VARCHAR name
+      VARCHAR address
+    }
+    PROFESSIONAL_SPECIALTIES {
+      BIGINT professional_id PK_FK
+      SMALLINT specialty_id PK_FK
+      BOOLEAN is_primary
+    }
+    PROFESSIONAL_LOCATIONS {
+      BIGINT professional_id PK_FK
+      SMALLINT location_id PK_FK
+    }
+    INSURANCE_REGIMES {
+      SMALLINT id PK
+      VARCHAR code UK
+    }
+    EPS {
+      BIGINT id PK
+      VARCHAR code UK
+      VARCHAR name
+    }
+    EPS_PLANS {
+      BIGINT id PK
+      BIGINT eps_id FK
+      SMALLINT regime_id FK
+      VARCHAR code
+      VARCHAR name
+    }
+    USER_INSURANCE_AFFILIATIONS {
+      BIGINT id PK
+      BIGINT user_id FK
+      BIGINT plan_id FK
+      VARCHAR membership_number
+      BOOLEAN is_current
+    }
+    APPOINTMENT_STATUSES {
+      SMALLINT id PK
+      VARCHAR code UK
+      BOOLEAN is_terminal
+    }
+    APPOINTMENTS {
+      BIGINT id PK
+      BIGINT patient_user_id FK
+      BIGINT professional_id FK
+      SMALLINT location_id FK
+      SMALLINT specialty_id FK
+      BIGINT insurance_affiliation_id FK
+      SMALLINT status_id FK
+      DATETIME scheduled_start_at
+      DATETIME scheduled_end_at
+    }
+    AVAILABILITY_BLOCKS {
+      BIGINT id PK
+      BIGINT professional_id FK
+      SMALLINT location_id FK
+      DATE available_date
+      TIME start_time
+      TIME end_time
+      BOOLEAN active
+    }
+    PROFESSIONAL_SLOTS {
+      BIGINT id PK
+      BIGINT availability_block_id FK
+      BIGINT appointment_id FK
+      DATETIME start_at
+      DATETIME end_at
+    }
+    APPOINTMENT_STATUS_HISTORY {
+      BIGINT id PK
+      BIGINT appointment_id FK
+      SMALLINT status_id FK
+      BIGINT changed_by_user_id FK
+      VARCHAR change_source
+      VARCHAR reason
+    }
+    RESCHEDULE_REQUEST_STATUSES {
+      SMALLINT id PK
+      VARCHAR code UK
+    }
+    RESCHEDULE_REQUESTS {
+      BIGINT id PK
+      BIGINT appointment_id FK
+      BIGINT requested_by_user_id FK
+      SMALLINT requested_location_id FK
+      SMALLINT status_id FK
+      DATETIME requested_start_at
+      DATETIME requested_end_at
+      VARCHAR patient_action_after_rejection
+    }
+    REFRESH_TOKENS {
+      BIGINT id PK
+      BIGINT user_id FK
+      VARCHAR token_hash UK
+      DATETIME expires_at
+      DATETIME revoked_at
+    }
+    PASSWORD_RESET_TOKENS {
+      BIGINT id PK
+      BIGINT user_id FK
+      VARCHAR token_hash UK
+      DATETIME expires_at
+      DATETIME used_at
+    }

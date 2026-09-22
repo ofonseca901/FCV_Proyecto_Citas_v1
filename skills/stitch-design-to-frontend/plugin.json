@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "stitch-design-to-frontend",
+  "version": "1.0.0",
+  "description": "Guides a Google Stitch UI from discovery and iterative design through explicit approval, Google AI Studio frontend implementation, and final visual reconciliation."
+}

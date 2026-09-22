@@ -1,0 +1,7 @@
+interface:
+  display_name: "Scrum Spec Orchestrator"
+  short_description: "Diseña y valida épicas e historias de usuario con documentación Obsidian."
+  default_prompt: "Convierte los requerimientos de este proyecto web en una especificación Scrum trazable, documentada en Obsidian, y ayúdame a validar el cierre de las historias sin modificar el código."
+
+policy:
+  allow_implicit_invocation: true

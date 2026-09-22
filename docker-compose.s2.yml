@@ -1,0 +1,11 @@
+# Local S2 overlay: the existing volume exposes citas_fcv_training.
+# Preserve the original .env and MySQL volume; do not reinitialize either.
+services:
+  citas-api-dev:
+    environment:
+      DB_NAME: citas_fcv_training
+      JWT_ACCESS_SECRET: ${S2_JWT_ACCESS_SECRET:?Run scripts/start-s2.ps1 first}
+      JWT_REFRESH_SECRET: ${S2_JWT_REFRESH_SECRET:?Run scripts/start-s2.ps1 first}
+    command: ["mvn", "-B", "-ntp", "spring-boot:run"]
+  citas-web-dev:
+    command: ["sh", "-c", "npm ci && npm run dev"]
