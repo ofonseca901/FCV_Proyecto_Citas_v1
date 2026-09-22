@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "scrum-spec-orchestrator",
   "version": "1.0.0",
   "description": "Planifica y mantiene especificaciones Scrum orientadas a Spec-Driven Development, documentadas para Obsidian y cerradas con evidencia de solo lectura del repositorio."
 }
+=======
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "scrum-spec-orchestrator",
+  "version": "1.0.0",
+  "description": "Planifica y mantiene especificaciones Scrum orientadas a Spec-Driven Development, documentadas para Obsidian y cerradas con evidencia de solo lectura del repositorio."
+}
+>>>>>>> d8afae289e730587ae3ff67961e2196e8aa79fb3
