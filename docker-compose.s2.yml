@@ -1,6 +1,10 @@
 # Local S2 overlay: the existing volume exposes citas_fcv_training.
 # Preserve the original .env and MySQL volume; do not reinitialize either.
 services:
+  mysql:
+    environment:
+      # El volumen existente y las migraciones S2/S3 usan este esquema.
+      MYSQL_DATABASE: citas_fcv_training
   citas-api-dev:
     environment:
       DB_NAME: citas_fcv_training

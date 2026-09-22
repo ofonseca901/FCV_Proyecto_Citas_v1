@@ -1,4 +1,4 @@
-# citas-web — incremento S2
+# citas-web — incrementos S2/S3
 
 React + TypeScript + Vite con formularios de login y registro, mensajes de error, vista de sesión y logout. Consume Spring Boot directamente por REST, sin Express/BFF.
 

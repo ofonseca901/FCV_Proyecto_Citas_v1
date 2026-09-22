@@ -1,17 +1,15 @@
-<<<<<<< HEAD
-# GOAL 2 — guiado avanzado: cita especializada end-to-end
+# GOAL 2 — guiado avanzado: disponibilidad y cita especializada S3
 
-Ejecutar desde el workspace raíz con visibilidad de ambos repos.
-
-```text
-/goal Implementa de extremo a extremo la HU aprobada de solicitud de cita especializada. Lee primero PRD, HU/DoD, contrato REST vigente y AGENTS de ambos repos. La meta se cumple solo cuando: USER puede seleccionar sede + especialidad + profesional + horario; el frontend envía la solicitud real a citas-api; backend retiene los slots requeridos; la cita queda REQUESTED; una segunda reserva incompatible no puede tomar esos slots; la respuesta/errores se muestran correctamente en frontend; las pruebas backend del flujo pasan; el frontend compila y sus verificaciones disponibles pasan; no hay secretos hardcodeados. No implementes todavía la decisión ADMIN si no pertenece a esta HU. Mantén un log corto de checkpoints y detente si una incompatibilidad de contrato requiere decisión humana.
-```
-=======
-# GOAL 2 — guiado avanzado: cita especializada end-to-end
-
-Ejecutar desde el workspace raíz con visibilidad de ambos repos.
+Ejecutar desde la raíz con visibilidad de `citas-api` y `citas-web`.
 
 ```text
-/goal Implementa de extremo a extremo la HU aprobada de solicitud de cita especializada. Lee primero PRD, HU/DoD, contrato REST vigente y AGENTS de ambos repos. La meta se cumple solo cuando: USER puede seleccionar sede + especialidad + profesional + horario; el frontend envía la solicitud real a citas-api; backend retiene los slots requeridos; la cita queda REQUESTED; una segunda reserva incompatible no puede tomar esos slots; la respuesta/errores se muestran correctamente en frontend; las pruebas backend del flujo pasan; el frontend compila y sus verificaciones disponibles pasan; no hay secretos hardcodeados. No implementes todavía la decisión ADMIN si no pertenece a esta HU. Mantén un log corto de checkpoints y detente si una incompatibilidad de contrato requiere decisión humana.
+/goal Implementa el incremento S3 de disponibilidad y solicitud de cita especializada siguiendo LOOP_02_GUIADO_AVANZADO.md. Antes de editar lee GUIA_SESIONES_S2_S6.md, PRD, épicas/HU aprobadas, AGENTS de ambos repositorios, contrato REST y modelo Flyway vigente.
+
+La condición final verificable es: catálogos activos consultables; PROFESSIONAL publica bloques futuros sin solapamiento en sedes asignadas; USER consulta franjas completas de 30/60 minutos; una cita general queda APPROVED; una especializada queda REQUESTED y retiene slots; doble reserva falla sin datos parciales; ADMIN aprueba/rechaza con motivo obligatorio al rechazar; slots se liberan al rechazo; UI muestra éxito/error; autorización, typecheck/build, pruebas API, smoke y escaneo de secretos pasan.
+
+No implementes S4 (mis citas, cancelación, reprogramación, recuperación, cierre, auditoría completa) ni S5/S6. No uses usuarios, contraseñas, tokens o PII reales. Si el entorno MySQL existente no permite al usuario de aplicación acceder al esquema, detente y solicita la corrección de credenciales/permisos; no borres el volumen.
 ```
->>>>>>> d8afae289e730587ae3ff67961e2196e8aa79fb3
+
+## Criterio de parada
+
+`PASS` solo con evidencia backend y frontend enlazada a HU/CA. Un build aislado no cierra el goal. Registrar iteration/checkpoints y dejar `BLOCKED` si falta una cuenta sintética ADMIN/PROFESSIONAL, una decisión de contrato o acceso a la base.

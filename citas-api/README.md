@@ -1,4 +1,4 @@
-# citas-api — incremento S2
+# citas-api — incrementos S2/S3
 
 Backend académico ejecutable: registro USER, login JWT, refresh con rotación, logout y consulta de identidad. Java 21, Spring Boot 3.5.16, Maven, arquitectura hexagonal, JPA, MySQL 8.4 y Flyway. Sin pacientes ni profesionales reales.
 

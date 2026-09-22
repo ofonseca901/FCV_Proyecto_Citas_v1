@@ -1,6 +1,6 @@
 # Proyecto FCV — Sistema ficticio de agendamiento de citas
 
-## Incremento S2 implementado
+## Incrementos S2/S3 implementados
 
 El workspace ya incluye backend Spring Boot y frontend React para registro e inicio de sesión, renovaciones JWT y logout. La descripción de plantilla que sigue conserva el contexto original del curso.
 
