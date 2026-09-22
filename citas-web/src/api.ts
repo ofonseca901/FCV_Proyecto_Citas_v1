@@ -10,10 +10,10 @@ export class ApiError extends Error {
   constructor(message: string, public status: number) { super(message); }
 }
 
-async function request<T>(path: string, body?: unknown, token?: string): Promise<T> {
+async function request<T>(path: string, body?: unknown, token?: string, root = '/api/auth'): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${base}/api/auth${path}`, {
+    response = await fetch(`${base}${root}${path}`, {
       method: body === undefined ? 'GET' : 'POST',
       headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -35,4 +35,15 @@ export const api = {
   refresh: (refreshToken: string) => request<Session>('/refresh', { refreshToken }),
   me: (token: string) => request<User>('/me', undefined, token),
   logout: (token: string) => request<void>('/logout', {}, token),
+  locations: () => request<Catalog[]>('/catalogs/locations', undefined, undefined, '/api'),
+  specialties: () => request<Specialty[]>('/catalogs/specialties', undefined, undefined, '/api'),
+  availability: (locationId: number, specialtyId: number, date: string) => request<Availability[]>(`/availability?locationId=${locationId}&specialtyId=${specialtyId}&date=${date}`, undefined, undefined, '/api'),
+  book: (token: string, data: Booking) => request<{id:number}>('/appointments', data, token, '/api'),
+  requested: (token: string) => request<RequestedAppointment[]>('/admin/appointments/requested', undefined, token, '/api'),
+  decide: (token: string, id: number, approve: boolean, reason?: string) => request<void>(`/admin/appointments/${id}/decision`, { approve, reason }, token, '/api'),
 };
+export interface Catalog { id:number; code:string; name:string }
+export interface Specialty extends Catalog { durationMinutes:number; general:boolean; requiresApproval:boolean }
+export interface Availability { professionalId:number; locationId:number; professionalCode:string; firstName:string; lastName:string; startAt:string; durationMinutes:number }
+export interface Booking { professionalId:number; locationId:number; specialtyId:number; startAt:string }
+export interface RequestedAppointment { id:number; scheduledStartAt:string; patientFirstName:string; patientLastName:string; professionalCode:string; specialty:string; location:string }

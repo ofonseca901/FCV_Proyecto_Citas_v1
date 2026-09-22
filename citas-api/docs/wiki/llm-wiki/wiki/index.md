@@ -20,7 +20,9 @@ sources:
 ## Contratos y estado
 
 - [Contrato REST de autenticación](contrato-auth.md) — endpoints, validación y reglas de sesión.
+- [Contrato REST S3](contrato-s3.md) — catálogos, disponibilidad, reservas y decisión administrativa.
 - [Evidencia y pendientes S2](s2-evidencia.md) — comandos, resultados, límites y aprobaciones pendientes.
+- [Evidencia S3](s3-evidencia.md) — migración, compilaciones y limitaciones verificadas.
 - [Decisiones](decisiones.md) — decisiones explícitas separadas de hechos y propuestas.
 - [Riesgos y preguntas abiertas](riesgos.md) — contradicciones, dependencias y decisiones que requieren confirmación.
 - [Preferencias y guardrails](preferencias.md) — convenciones duraderas del laboratorio.

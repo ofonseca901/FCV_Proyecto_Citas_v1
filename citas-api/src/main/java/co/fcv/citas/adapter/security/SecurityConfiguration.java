@@ -5,6 +5,7 @@ import co.fcv.citas.adapter.web.AuthFacade;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,7 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.*;
 
-@Configuration
+@Configuration @EnableMethodSecurity
 public class SecurityConfiguration {
     @Bean SecurityFilterChain security(HttpSecurity http, JwtTokens tokens, AuthFacade facade) throws Exception {
         return http.csrf(csrf -> csrf.disable()).cors(cors -> {})
