@@ -1,19 +1,13 @@
-# GOAL 1 — guiado simple: autenticación verificable
+# GOAL 1 — guiado sencillo: autenticación JWT
 
-## Objetivo
+## Objetivo didáctico
+Aprender a escribir una condición final verificable sin abarcar todo el producto.
 
-Construir el primer vertical slice de S2 sin mezclar agenda ni citas. La aplicación debe autenticarse contra el esquema configurado por el overlay (`citas_fcv_training`) y la tabla efectiva `app_users`.
-
-## Prompt para Codex/Claude
+### Codex
 
 ```text
-/goal Implementa la HU aprobada de registro y sesión JWT en citas-api. Lee primero PRD, HU/DoD, contrato-auth, AGENTS y application.yml. Verifica el datasource real sin abrir ni imprimir .env: el entorno S2 debe usar el overlay y el esquema citas_fcv_training.
-
-La condición final exige: registro de USER con email y documento únicos; password hasheado; login que emite access/refresh; refresh rotativo; logout revocable; /me con ownership; errores 400/401/409; CORS explícito; no tokens/passwords en logs; migración Flyway coherente; 6 o más pruebas backend relevantes; smoke-auth HTTP contra MySQL; y build frontend con registro/login/logout. No implementes recuperación, agenda, citas ni roles administrativos en este goal.
-
-Trabaja por checkpoints: red, cambio mínimo, green, revisión de contrato y evidencia. Si la tabla users de una base de referencia no coincide con app_users del esquema S2, detente y documenta la decisión; no renombres tablas ni borres volúmenes automáticamente. Tras 3 intentos con la misma causa, termina BLOCKED con evidencia.
+/goal Implementa la HU aprobada de registro + login JWT en citas-api sin salir de su alcance. Antes de editar lee la HU, sus criterios de aceptación y DoD. Trabaja por checkpoints. Debes detenerte únicamente cuando: (1) registro de USER funcione con email/documento únicos, (2) password quede hasheado, (3) login emita access y refresh token, (4) refresh válido genere una sesión renovada según el diseño elegido, (5) casos negativos definidos por la HU tengan pruebas, (6) mvn test pase. No implementes UI ni recuperación de contraseña. Si necesitas cambiar el esquema, usa Flyway. Si después de 3 intentos el mismo criterio sigue fallando, pausa y reporta bloqueo con evidencia.
 ```
 
-## Evidencia
-
-Registrar comando, resultado, commit y limitaciones. El smoke solo debe informar PASS/FAIL y conteos, nunca credenciales o tokens.
+### Claude Code equivalente
+Usa la misma condición con `/goal ...`. No necesita `/loop` para este ejercicio.

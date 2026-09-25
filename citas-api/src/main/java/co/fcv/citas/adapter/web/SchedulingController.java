@@ -10,7 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-@RestController @RequestMapping("/api")
+@RestController @RequestMapping({"/api","/api/v1"})
 public class SchedulingController {
   private final SchedulingFacade service;
   public SchedulingController(SchedulingFacade service){this.service=service;}
@@ -21,6 +21,8 @@ public class SchedulingController {
   public record BlockRequest(@Positive long professionalId,@Positive long locationId,@NotNull LocalDate date,@NotNull LocalTime startTime,@NotNull LocalTime endTime){}
   public record BookingRequest(@Positive long professionalId,@Positive long locationId,@Positive long specialtyId,@NotNull LocalDateTime startAt){}
   public record DecisionRequest(boolean approve,@Size(max=500) String reason){}
+  public record RescheduleRequest(@NotNull LocalDateTime startAt){}
+  public record ClosureRequest(@NotBlank @Pattern(regexp="COMPLETED|NO_SHOW") String status){}
   @GetMapping("/catalogs/locations") public List<Map<String,Object>> locations(){return service.locations();}
   @GetMapping("/catalogs/specialties") public List<Map<String,Object>> specialties(){return service.specialties();}
   @PostMapping("/admin/specialties") @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasRole('ADMIN')") public Map<String,Long> specialty(@Valid @RequestBody SpecialtyRequest r){return Map.of("id",service.specialty(r.code(),r.name(),r.durationMinutes(),r.general()));}
@@ -33,5 +35,13 @@ public class SchedulingController {
   @PostMapping("/appointments") @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasRole('USER')") public Map<String,Long> book(@AuthenticationPrincipal Jwt jwt,@Valid @RequestBody BookingRequest r){return Map.of("id",service.book(user(jwt),r.professionalId(),r.locationId(),r.specialtyId(),r.startAt()));}
   @GetMapping("/admin/appointments/requested") @PreAuthorize("hasRole('ADMIN')") public List<Map<String,Object>> requested(){return service.requested();}
   @PostMapping("/admin/appointments/{id}/decision") @PreAuthorize("hasRole('ADMIN')") public void decide(@AuthenticationPrincipal Jwt jwt,@PathVariable long id,@Valid @RequestBody DecisionRequest r){service.decide(user(jwt),id,r.approve(),r.reason());}
+  @GetMapping("/appointments") @PreAuthorize("hasRole('USER')") public List<Map<String,Object>> mine(@AuthenticationPrincipal Jwt jwt,@RequestParam(required=false) String status,@RequestParam(required=false) LocalDate from,@RequestParam(required=false) LocalDate to){return service.mine(user(jwt),status,from,to);}
+  @GetMapping("/appointments/{id}/history") @PreAuthorize("hasRole('USER')") public List<Map<String,Object>> history(@AuthenticationPrincipal Jwt jwt,@PathVariable long id){return service.history(user(jwt),id);}
+  @PostMapping("/appointments/{id}/cancel") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasRole('USER')") public void cancel(@AuthenticationPrincipal Jwt jwt,@PathVariable long id){service.cancel(user(jwt),id);}
+  @PostMapping("/appointments/{id}/reschedule-requests") @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasRole('USER')") public Map<String,Long> reschedule(@AuthenticationPrincipal Jwt jwt,@PathVariable long id,@Valid @RequestBody RescheduleRequest r){return Map.of("id",service.reschedule(user(jwt),id,r.startAt()));}
+  @GetMapping("/admin/inbox") @PreAuthorize("hasRole('ADMIN')") public List<Map<String,Object>> inbox(){return service.inbox();}
+  @PostMapping("/admin/reschedule-requests/{id}/decision") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasRole('ADMIN')") public void rescheduleDecision(@AuthenticationPrincipal Jwt jwt,@PathVariable long id,@Valid @RequestBody DecisionRequest r){service.decideReschedule(user(jwt),id,r.approve(),r.reason());}
+  @GetMapping("/professional/appointments") @PreAuthorize("hasRole('PROFESSIONAL')") public List<Map<String,Object>> agenda(@AuthenticationPrincipal Jwt jwt,@RequestParam LocalDate from,@RequestParam LocalDate to,@RequestParam(required=false) Long locationId){return service.agenda(user(jwt),from,to,locationId);}
+  @PostMapping("/professional/appointments/{id}/closure") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasRole('PROFESSIONAL')") public void closure(@AuthenticationPrincipal Jwt jwt,@PathVariable long id,@Valid @RequestBody ClosureRequest r){service.close(user(jwt),id,r.status());}
   private long user(Jwt jwt){return Long.parseLong(jwt.getSubject());}
 }

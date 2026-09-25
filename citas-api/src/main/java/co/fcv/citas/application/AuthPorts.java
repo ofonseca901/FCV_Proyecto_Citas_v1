@@ -16,6 +16,7 @@ public final class AuthPorts {
         void create(AuthSession session);
         Optional<AuthSession> byId(String id);
         boolean rotate(String sessionId, String oldRefreshId, String newRefreshId, Instant now);
+        boolean touch(String sessionId, Long userId, Instant now);
         void revoke(String id, Long userId);
     }
     public interface Passwords {

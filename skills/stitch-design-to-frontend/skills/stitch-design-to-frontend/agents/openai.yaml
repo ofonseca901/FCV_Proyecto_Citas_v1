@@ -1,15 +1,6 @@
-<<<<<<< HEAD
 interface:
   display_name: "Stitch Design to Frontend"
   short_description: "Design in Stitch, iterate, and hand off to AI Studio."
   default_prompt: "Help me turn this product or interface into a high-quality Google Stitch design, iterate it to approval, and then obtain matching frontend code from Google AI Studio."
 policy:
   allow_implicit_invocation: true
-=======
-interface:
-  display_name: "Stitch Design to Frontend"
-  short_description: "Design in Stitch, iterate, and hand off to AI Studio."
-  default_prompt: "Help me turn this product or interface into a high-quality Google Stitch design, iterate it to approval, and then obtain matching frontend code from Google AI Studio."
-policy:
-  allow_implicit_invocation: true
->>>>>>> d8afae289e730587ae3ff67961e2196e8aa79fb3

@@ -40,9 +40,10 @@ Ramas:
 Mínimo un commit trazable por sesión S2-S6. No reescribir el historial para ocultar el progreso.
 
 ## Documentación
-En `citas-api/docs/wiki/`:
-- `scrum/`: producida por `scrum-spec-orchestrator`.
+En `citas-api/docs/FCV Dev/`:
+- `scrum/`: especificaciones del producto; la Skill debe actualizar su allowlist antes de volver a escribir en esta ruta.
 - `llm-wiki/`: wiki global mantenida por el agente orquestador.
+- `subagents/`: catálogo operativo de subagentes del orquestador.
 - contratos/decisiones pueden enlazarse desde ambas.
 
 ## Variables de entorno

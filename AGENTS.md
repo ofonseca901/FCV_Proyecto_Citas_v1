@@ -1,47 +1,53 @@
-# Instrucciones del workspace FCV Citas
+# Orquestación del workspace `citas`
 
-## Contexto
-Laboratorio académico con datos sintéticos. Leer `README.md`, `PRD.md`, `RESTRICCIONES_TECNICAS.md`, los AGENTS del repositorio afectado y `citas-api/docs/wiki/llm-wiki/wiki/index.md` antes de modificar funcionalidades.
+## Alcance y repositorios
 
-## Responsabilidades
-- `citas-api`: Java 21, Spring Boot 3.5.x, Maven, dominio/aplicación independientes de Spring, adaptadores REST/JPA/seguridad, MySQL y Flyway.
-- `citas-web`: React + Vite + TypeScript; consume directamente REST, sin Express/BFF.
-- Única wiki global: `citas-api/docs/wiki/llm-wiki/`.
-- Antes de cambios en ambos repos, describir alcance y archivos afectados. Mantener coherencia del contrato de autenticación.
+- Esta raíz orquesta exactamente dos repositorios Git independientes: `citas-api` y `citas-web`.
+- No inicializar Git en la raíz ni mezclar responsabilidades entre repositorios.
+- El frontend consume directamente `citas-api` por REST; no usar Express ni BFF.
 
-## Coordinación cross-repo
-- Una Historia de Usuario (HU) es la unidad primaria de alcance y Definition of Done.
-- Antes de modificar ambos repositorios, declarar: HU, objetivo, contrato REST afectado y archivos previstos por repositorio.
-- Un cambio de contrato REST exige actualizar documentación, pruebas del backend y consumidor del frontend; no se considera terminado con evidencia de un solo repo.
-- La raíz conserva su Git histórico; los repositorios de aplicación se operan con `git -C citas-api` y `git -C citas-web`.
+## Inicio de cada tarea
 
-## Trabajo y evidencia
-- Ambos repos tienen `main` y `develop`. Trabajar en `develop`, no fusionar ni publicar sin solicitud.
-- Existe un Git raíz previo a S2. Preservar su historial; no eliminarlo ni convertirlo en submódulos implícitamente. No usar `git add .` en la raíz para registrar repos anidados.
-- No leer ni imprimir `.env`, credenciales, JWT o hashes. Usar variables de entorno y ejemplos sin secretos.
-- Usar solo datos sintéticos de prueba; no enviar correos ni conectar sistemas reales.
-- Planificación Scrum con la skill local limitada a `docs/wiki/scrum/`; no marcar aprobaciones o validaciones sin evidencia.
-- Los prompts en `prompts/` son material de formación, no acciones que ejecutar automáticamente.
-- Actualizar wiki, contrato y evidencia S2 al modificar comportamiento. Registrar limitaciones reales.
+1. Leer `README.md`, `PRD.md`, `RESTRICCIONES_TECNICAS.md` y `database/REQUISITOS_NORMALIZACION_3FN.md`.
+2. Leer los `AGENTS.md` específicos cuando existan.
+3. Para consultas de conocimiento, leer primero `citas-api/docs/FCV Dev/llm-wiki/wiki/index.md`.
+4. Confirmar el alcance contra una HU y su DoD cuando estén disponibles.
 
-## LLM Wiki global
-- `raw/` contiene fuentes curadas e inmutables; el agente las lee y nunca reescribe una fuente aprobada durante INGEST.
-- `wiki/` contiene síntesis mantenidas por el agente; toda página nueva debe enlazarse desde `wiki/index.md`.
-- `schema/` define convenciones y los flujos INGEST, QUERY, LEARN y LINT.
-- El conocimiento durable se clasifica como `HECHO`, `DECISIÓN`, `PREFERENCIA` o `PREGUNTA ABIERTA`, siempre con fuente y fecha de verificación.
-- `wiki/log.md` es append-only y registra operaciones realizadas, no conversaciones completas.
-- INGEST integra una fuente en páginas existentes y señala contradicciones; QUERY empieza por `wiki/index.md` y contrasta con código/especificaciones; LEARN solo persiste conocimiento verificable; LINT busca claims obsoletos, duplicados, huérfanos, enlaces rotos y decisiones no aprobadas.
-- Nunca persistir contraseñas, tokens, hashes, secretos, PII real ni contenido privado de FCV. No abrir `.env`.
+## Límites de responsabilidad
 
-## Automatizaciones n8n
-- Las exportaciones de workflows se versionan como JSON en `citas-api/automations/n8n/`.
-- No guardar credenciales, tokens OAuth, URLs privadas ni secretos embebidos en esos JSON.
-- Las notas Markdown de diseño o formación deben permanecer fuera de la carpeta de exportaciones y no se consideran workflows ejecutables; los archivos históricos existentes allí quedan como pendiente explícito de reubicación y no deben activarse.
+- `citas-api`: dominio, aplicación, persistencia, seguridad, REST, pruebas, migraciones y n8n.
+- `citas-web`: interfaz, navegación, estado visual, formularios, cliente REST y pruebas frontend.
+- No inventar requisitos, endpoints, estados, catálogos ni políticas ausentes de las fuentes aprobadas.
 
-## Verificación
-Desde raíz, con Docker disponible:
-`docker compose exec -T citas-api-dev mvn -B -ntp verify`
-`docker compose exec -T citas-web-dev npm run build`
-`node citas-api/scripts/smoke-auth.mjs`
+## Cambios cross-repo
 
-El script smoke requiere API ejecutándose, crea cuentas sintéticas y no imprime tokens ni contraseñas.
+Antes de cambiar un contrato REST, producir un plan que enumere repositorios, archivos, compatibilidad, migración y pruebas. Validar y documentar evidencia en ambos repositorios.
+
+## Git y seguridad
+
+- Trabajar en `develop`; reservar `main` para incrementos estables.
+- Preservar historial trazable; no reescribirlo para ocultar progreso.
+- No leer, mostrar ni versionar secretos, tokens, credenciales o PII.
+- Usar datos sintéticos; las referencias públicas FCV permitidas son únicamente las incluidas en los requisitos.
+- Los JSON de n8n viven en `citas-api/automations/n8n/` y no contienen credenciales.
+
+## Subagentes
+
+- Catálogo canónico: `citas-api/docs/FCV Dev/subagents/README.md`.
+- Elegir el subagente más específico y entregarle HU/CA/DoD, repositorio, archivos permitidos, contrato o diseño, autoridad de edición y evidencia esperada.
+- Los especialistas pueden analizar o editar solo cuando el encargo lo autoriza; los verificadores son siempre independientes y de solo lectura.
+- Ejecutar especialistas en paralelo únicamente cuando no compartan archivos de edición. Ejecutar verificadores después de la implementación.
+- El orquestador consolida resultados, resuelve solapamientos y evita convertir recomendaciones en requisitos no aprobados.
+
+## LLM Wiki
+
+- Ubicación única: `citas-api/docs/FCV Dev/llm-wiki/`.
+- `raw/` es inmutable; `wiki/` contiene síntesis verificadas; `schema/` gobierna formato y operación.
+- Toda modificación estructural actualiza `wiki/index.md`; toda operación relevante agrega una entrada append-only en `wiki/log.md`.
+- Persistir únicamente conocimiento durable clasificado como HECHO, DECISIÓN, PREFERENCIA o PREGUNTA ABIERTA.
+- Separar evidencia de inferencia y ejecutar LINT ante cambios relevantes.
+
+## Skills
+
+- `scrum-spec-orchestrator` conserva por ahora una allowlist interna para la ruta histórica `citas-api/docs/wiki/scrum/`; no invocarla sobre la nueva ubicación hasta actualizar esa Skill de forma explícita.
+- `stitch-design-to-frontend` gobierna Stitch → aprobación → AI Studio → reconciliación; no define backend.

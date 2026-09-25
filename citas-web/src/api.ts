@@ -1,120 +1,25 @@
-export interface User { id: number; firstName: string; lastName: string; email: string; roles: string[] }
-export interface Session { accessToken: string; refreshToken: string; tokenType: string; expiresIn: number; user: User }
-export interface Registration {
-  firstName: string; lastName: string; documentType: string; documentNumber: string;
-  email: string; phone: string; password: string;
-}
-const base = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
-
-export class ApiError extends Error {
-  constructor(message: string, public status: number) { super(message); }
-}
-
-async function request<T>(path: string, body?: unknown, token?: string, root = '/api/auth'): Promise<T> {
-  let response: Response;
-  try {
-    response = await fetch(`${base}${root}${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
-      headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal: AbortSignal.timeout(15000),
-    });
-  } catch {
-    throw new ApiError('No pudimos conectar con el servicio. Revisa tu conexión e inténtalo nuevamente.', 0);
-  }
-  if (!response.ok) {
-    const detail = await response.json().catch(() => null);
-    throw new ApiError(detail?.message || 'No pudimos completar la solicitud. Inténtalo nuevamente.', response.status);
-  }
-  return response.status === 204 ? undefined as T : response.json();
-}
-
-export const api = {
-  register: (data: Registration) => request<User>('/register', data),
-  login: (email: string, password: string) => request<Session>('/login', { email, password }),
-  refresh: (refreshToken: string) => request<Session>('/refresh', { refreshToken }),
-  me: (token: string) => request<User>('/me', undefined, token),
-  logout: (token: string) => request<void>('/logout', {}, token),
-  locations: () => request<Catalog[]>('/catalogs/locations', undefined, undefined, '/api'),
-  specialties: () => request<Specialty[]>('/catalogs/specialties', undefined, undefined, '/api'),
-  availability: (locationId: number, specialtyId: number, date: string) => request<Availability[]>(`/availability?locationId=${locationId}&specialtyId=${specialtyId}&date=${date}`, undefined, undefined, '/api'),
-  book: (token: string, data: Booking) => request<{id:number}>('/appointments', data, token, '/api'),
-  requested: (token: string) => request<RequestedAppointment[]>('/admin/appointments/requested', undefined, token, '/api'),
-  decide: (token: string, id: number, approve: boolean, reason?: string) => request<void>(`/admin/appointments/${id}/decision`, { approve, reason }, token, '/api'),
-};
+export interface User { id:number; firstName:string; lastName:string; email:string; roles:string[] }
+export interface Session { accessToken:string; refreshToken:string; tokenType:string; expiresIn:number; user:User }
+export interface Registration { firstName:string; lastName:string; documentType:string; documentNumber:string; email:string; phone:string; password:string }
 export interface Catalog { id:number; code:string; name:string }
 export interface Specialty extends Catalog { durationMinutes:number; general:boolean; requiresApproval:boolean }
 export interface Availability { professionalId:number; locationId:number; professionalCode:string; firstName:string; lastName:string; startAt:string; durationMinutes:number }
-export interface Booking { professionalId:number; locationId:number; specialtyId:number; startAt:string }
-export interface RequestedAppointment { id:number; scheduledStartAt:string; patientFirstName:string; patientLastName:string; professionalCode:string; specialty:string; location:string }
-
-export interface AppointmentSummary {
-  id: number;
-  scheduledStartAt: string;
-  scheduledEndAt: string;
-  status: string;
-  rejectionReason?: string | null;
-  professionalId?: number;
-  locationId?: number;
-  specialtyId?: number;
-  professionalCode: string;
-  specialty: string;
-  location: string;
-  durationMinutes: number;
-}
-
-export interface RescheduleRequest {
-  id: number;
-  appointmentId: number;
-  originalStartAt: string;
-  originalEndAt?: string;
-  newStartAt: string;
-  newEndAt?: string;
-  status: string;
-  professionalCode: string;
-  specialty: string;
-  location: string;
-  patientFirstName?: string;
-  patientLastName?: string;
-}
-
-export interface ProfessionalAppointment {
-  id: number;
-  scheduledStartAt: string;
-  scheduledEndAt: string;
-  status: string;
-  patientFirstName: string;
-  patientLastName: string;
-  specialty: string;
-  location: string;
-}
-
-export interface StatusHistoryEvent {
-  id: number;
-  status: string;
-  source: string;
-  reason?: string | null;
-  changedAt: string;
-}
-
-export interface RescheduleBooking { startAt: string }
-
-export const s4Api = {
-  appointments: (token: string, status?: string, date?: string) => {
-    const query = new URLSearchParams();
-    if (status && status !== 'ALL') query.set('status', status);
-    if (date) query.set('date', date);
-    return request<AppointmentSummary[]>(`/appointments/mine${query.size ? `?${query}` : ''}`, undefined, token, '/api');
-  },
-  cancel: (token: string, id: number, reason?: string) => request<void>(`/appointments/${id}/cancel`, reason ? { reason } : {}, token, '/api'),
-  reschedule: (token: string, id: number, data: RescheduleBooking) => request<{ id: number }>(`/appointments/${id}/reschedule`, data, token, '/api'),
-  history: (token: string, id: number) => request<StatusHistoryEvent[]>(`/appointments/${id}/history`, undefined, token, '/api'),
-  professionalAgenda: (token: string, date: string, locationId?: number) => {
-    const query = new URLSearchParams({ date });
-    if (locationId) query.set('locationId', String(locationId));
-    return request<ProfessionalAppointment[]>(`/professional/appointments?${query}`, undefined, token, '/api');
-  },
-  closeAppointment: (token: string, id: number, status: 'COMPLETED' | 'NO_SHOW') => request<void>(`/professional/appointments/${id}/close`, { status }, token, '/api'),
-  pendingReschedules: (token: string) => request<RescheduleRequest[]>('/admin/reschedules/pending', undefined, token, '/api'),
-  decideReschedule: (token: string, id: number, approve: boolean, reason?: string) => request<void>(`/admin/reschedules/${id}/decision`, { approve, reason }, token, '/api'),
+export interface Appointment { id:number; status:string; scheduledStartAt:string; scheduledEndAt:string; specialty:string; location:string; professionalCode:string; durationMinutes:number; professionalId:number; locationId:number; specialtyId:number; rejectionReason?:string }
+export interface InboxItem { id:number; appointmentId:number; originalStartAt:string; newStartAt:string; specialty:string; location:string; professionalCode:string; patientFirstName:string; patientLastName:string }
+export interface ProfessionalAppointment { id:number; status:string; scheduledStartAt:string; specialty:string; location:string; patientFirstName:string; patientLastName:string }
+export interface SpecialtyArticle { title:string; journal:string; publishedAt:string; firstAuthor:string; url:string; available:boolean }
+export interface ProfessionalSpecialty { id:number; name:string; code:string; primarySpecialty:boolean; latestArticle:SpecialtyArticle }
+export interface DirectoryUser { id:number; firstName:string; lastName:string; email:string; phone:string; active:boolean; roles:string }
+export interface DirectoryProfessional { id:number; userId:number; firstName:string; lastName:string; email:string; professionalCode:string; licenseNumber:string; active:boolean; specialties?:string; locations?:string }
+export interface AdminDashboard { activeUsers:number; activeProfessionals:number; pendingRequests:number; appointmentsByStatus:{status:string;total:number}[]; occupationByLocation:{name:string;total:number}[] }
+const base=(import.meta.env.VITE_API_URL||'http://localhost:8080').replace(/\/$/,'');
+export class ApiError extends Error { constructor(message:string,public status:number){super(message);} }
+async function request<T>(path:string,options:RequestInit={},token?:string):Promise<T>{let r:Response;try{r=await fetch(`${base}${path}`,{...options,headers:{'Content-Type':'application/json',...(options.headers||{}),...(token?{Authorization:`Bearer ${token}`}:{})},signal:AbortSignal.timeout(15000)});}catch{throw new ApiError('No fue posible conectar con el servicio.',0);}if(!r.ok){const d=await r.json().catch(()=>null);throw new ApiError(d?.message||'No fue posible completar la solicitud.',r.status);}return r.status===204?undefined as T:r.json();}
+const post=<T>(path:string,body:unknown,token?:string)=>request<T>(path,{method:'POST',body:JSON.stringify(body)},token);
+export const api={
+ register:(data:Registration)=>post<User>('/api/auth/register',data), login:(email:string,password:string)=>post<Session>('/api/auth/login',{email,password}), refresh:(refreshToken:string)=>post<Session>('/api/auth/refresh',{refreshToken}), logout:(token:string)=>post<void>('/api/auth/logout',{},token),
+ locations:()=>request<Catalog[]>('/api/v1/catalogs/locations'), specialties:()=>request<Specialty[]>('/api/v1/catalogs/specialties'), availability:(locationId:number,specialtyId:number,date:string)=>request<Availability[]>(`/api/v1/availability?locationId=${locationId}&specialtyId=${specialtyId}&date=${date}`),
+ book:(token:string,data:object)=>post<{id:number}>('/api/v1/appointments',data,token), appointments:(token:string)=>request<Appointment[]>('/api/v1/appointments',{},token), cancel:(token:string,id:number)=>post<void>(`/api/v1/appointments/${id}/cancel`,{},token), reschedule:(token:string,id:number,startAt:string)=>post<{id:number}>(`/api/v1/appointments/${id}/reschedule-requests`,{startAt},token), history:(token:string,id:number)=>request<object[]>(`/api/v1/appointments/${id}/history`,{},token),
+ inbox:(token:string)=>request<InboxItem[]>('/api/v1/admin/inbox',{},token), decideReschedule:(token:string,id:number,approve:boolean,reason?:string)=>post<void>(`/api/v1/admin/reschedule-requests/${id}/decision`,{approve,reason},token), agenda:(token:string,from:string,to:string)=>request<ProfessionalAppointment[]>(`/api/v1/professional/appointments?from=${from}&to=${to}`,{},token), professionalSpecialties:(token:string)=>request<ProfessionalSpecialty[]>('/api/v1/professional/specialties',{},token), close:(token:string,id:number,status:string)=>post<void>(`/api/v1/professional/appointments/${id}/closure`,{status},token)
+ ,dashboard:(token:string)=>request<AdminDashboard>('/api/v1/admin/dashboard',{},token), users:(token:string,q='')=>request<{items:DirectoryUser[];total:number}>(`/api/v1/admin/users?q=${encodeURIComponent(q)}`,{},token), createUser:(token:string,data:Registration)=>post<{id:number}>('/api/v1/admin/users',data,token), userActive:(token:string,id:number,active:boolean)=>request<void>(`/api/v1/admin/users/${id}/active`,{method:'PATCH',body:JSON.stringify({active})},token), professionals:(token:string)=>request<DirectoryProfessional[]>('/api/v1/admin/professionals',{},token), professionalActive:(token:string,id:number,active:boolean)=>request<void>(`/api/v1/admin/professionals/${id}/active`,{method:'PATCH',body:JSON.stringify({active})},token)
 };

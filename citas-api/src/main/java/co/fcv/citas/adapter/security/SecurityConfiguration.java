@@ -21,7 +21,7 @@ public class SecurityConfiguration {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/refresh").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/catalogs/**", "/api/availability").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/catalogs/**", "/api/availability", "/api/v1/catalogs/**", "/api/v1/availability").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/actuator/health").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o.jwt(j -> j.decoder(tokens.accessDecoder()).jwtAuthenticationConverter(jwt -> {
@@ -41,7 +41,7 @@ public class SecurityConfiguration {
     }
     @Bean CorsConfigurationSource corsConfigurationSource(@Value("${app.frontend-origin}") String origin) {
         CorsConfiguration c = new CorsConfiguration();
-        c.setAllowedOrigins(List.of(origin)); c.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
+        c.setAllowedOrigins(List.of(origin)); c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("Authorization", "Content-Type")); c.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(); source.registerCorsConfiguration("/**", c);
         return source;

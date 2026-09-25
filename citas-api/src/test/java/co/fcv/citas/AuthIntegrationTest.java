@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import org.junit.jupiter.api.Test;
@@ -118,6 +119,16 @@ class AuthIntegrationTest {
                 .claim("purpose", "access").claim("sid", UUID.randomUUID().toString()).build();
         String expired = encoder.encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
         me(expired, 401);
+    }
+
+    @Test void inactiveSessionIsRevokedAfterTenMinutes() throws Exception {
+        var data = registration(); postJson("/register", data).andExpect(status().isCreated());
+        JsonNode session = login(data);
+        Long userId = jdbc.queryForObject("select id from app_users where email=?", Long.class, data.get("email"));
+        String sessionId = jdbc.queryForObject("select id from auth_sessions where user_id=?", String.class, userId);
+        jdbc.update("update auth_sessions set last_activity_at=? where id=?", Instant.now().minus(Duration.ofMinutes(11)), sessionId);
+        me(session.path("accessToken").asText(), 401);
+        assertThat(jdbc.queryForObject("select revoked from auth_sessions where id=?", Boolean.class, sessionId)).isTrue();
     }
 
     @Test void corsOnlyAllowsConfiguredFrontend() throws Exception {

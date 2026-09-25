@@ -6,8 +6,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface SessionJpaRepository extends JpaRepository<SessionEntity, String> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("update SessionEntity s set s.refreshId = :next where s.id = :id and s.refreshId = :old and s.revoked = false and s.expiresAt > :now")
+    @Query("update SessionEntity s set s.refreshId = :next, s.lastActivityAt = :now where s.id = :id and s.refreshId = :old and s.revoked = false and s.expiresAt > :now")
     int rotate(@Param("id") String id, @Param("old") String old, @Param("next") String next, @Param("now") Instant now);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update SessionEntity s set s.lastActivityAt = :now where s.id = :id and s.userId = :userId and s.revoked = false and s.expiresAt > :now")
+    int touch(@Param("id") String id, @Param("userId") Long userId, @Param("now") Instant now);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update SessionEntity s set s.revoked = true where s.id = :id and s.userId = :userId")

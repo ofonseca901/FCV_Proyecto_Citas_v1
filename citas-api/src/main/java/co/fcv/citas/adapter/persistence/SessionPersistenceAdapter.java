@@ -13,13 +13,14 @@ public class SessionPersistenceAdapter implements AuthPorts.Sessions {
     public void create(AuthSession session) {
         SessionEntity e = new SessionEntity();
         e.id = session.id(); e.userId = session.userId(); e.refreshId = session.refreshId();
-        e.expiresAt = session.expiresAt(); e.revoked = session.revoked(); repository.saveAndFlush(e);
+        e.expiresAt = session.expiresAt(); e.lastActivityAt = session.lastActivityAt(); e.revoked = session.revoked(); repository.saveAndFlush(e);
     }
     public Optional<AuthSession> byId(String id) {
-        return repository.findById(id).map(e -> new AuthSession(e.id, e.userId, e.refreshId, e.expiresAt, e.revoked));
+        return repository.findById(id).map(e -> new AuthSession(e.id, e.userId, e.refreshId, e.expiresAt, e.lastActivityAt, e.revoked));
     }
     public boolean rotate(String id, String old, String next, Instant now) {
         return repository.rotate(id, old, next, now) == 1;
     }
+    public boolean touch(String id, Long userId, Instant now) { return repository.touch(id, userId, now) == 1; }
     public void revoke(String id, Long userId) { repository.revoke(id, userId); }
 }

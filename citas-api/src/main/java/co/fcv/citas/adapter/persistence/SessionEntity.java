@@ -9,5 +9,6 @@ public class SessionEntity {
     @Column(nullable = false) public Long userId;
     @Column(nullable = false, length = 36) public String refreshId;
     @Column(nullable = false) public Instant expiresAt;
+    @Column(nullable = false) public Instant lastActivityAt;
     @Column(nullable = false) public boolean revoked;
 }

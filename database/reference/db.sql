@@ -505,7 +505,7 @@ INSERT INTO users
 VALUES
 (1, 'Admin', 'Laboratorio', 'CC', '900000001', 'admin@demo.invalid', '3000000001', '$2y$10$QAPT/bPvvEILB0ovqykfTuwSBznwY2p0rJhZJguneKjk2dr7VQFeG', TRUE, TRUE),
 
-(10, 'Andrea', 'Ruiz', 'CC', '910000010', 'andrea.ruiz@demo.invalid', '3100000010', '$2y$10$QAPT/bPvvEILB0ovqykfTuwSBznwY2p0rJhZJguneKjk2dr7VQFeG', TRUE, TRUE), 
+(10, 'Andrea', 'Ruiz', 'CC', '910000010', 'andrea.ruiz@demo.invalid', '3100000010', '$2y$10$QAPT/bPvvEILB0ovqykfTuwSBznwY2p0rJhZJguneKjk2dr7VQFeG', TRUE, TRUE),
 (11, 'Carlos', 'Mejía', 'CC', '910000011', 'carlos.mejia@demo.invalid', '3100000011', '$2y$10$QAPT/bPvvEILB0ovqykfTuwSBznwY2p0rJhZJguneKjk2dr7VQFeG', TRUE, TRUE),
 (12, 'Diana', 'Torres', 'CC', '910000012', 'diana.torres@demo.invalid', '3100000012', '$2y$10$QAPT/bPvvEILB0ovqykfTuwSBznwY2p0rJhZJguneKjk2dr7VQFeG', TRUE, TRUE),
 (13, 'Felipe', 'Rojas', 'CC', '910000013', 'felipe.rojas@demo.invalid', '3100000013', '$2y$10$QAPT/bPvvEILB0ovqykfTuwSBznwY2p0rJhZJguneKjk2dr7VQFeG', TRUE, TRUE),

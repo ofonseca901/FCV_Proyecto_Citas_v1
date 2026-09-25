@@ -18,12 +18,13 @@ public final class AuthService {
     private final Tokens tokens;
     private final Clock clock;
     private final Duration refreshLifetime;
+    private final Duration inactivityTimeout;
     private final String dummyHash;
 
     public AuthService(Users users, Sessions sessions, Passwords passwords, Tokens tokens,
-                       Clock clock, Duration refreshLifetime) {
+                       Clock clock, Duration refreshLifetime, Duration inactivityTimeout) {
         this.users = users; this.sessions = sessions; this.passwords = passwords;
-        this.tokens = tokens; this.clock = clock; this.refreshLifetime = refreshLifetime;
+        this.tokens = tokens; this.clock = clock; this.refreshLifetime = refreshLifetime; this.inactivityTimeout = inactivityTimeout;
         this.dummyHash = passwords.hash(UUID.randomUUID().toString());
     }
 
@@ -47,7 +48,7 @@ public final class AuthService {
         boolean matches = passwords.matches(password, user == null ? dummyHash : user.passwordHash());
         if (!matches || user == null || !user.active()) throw AuthFailure.unauthorized();
         AuthSession session = new AuthSession(UUID.randomUUID().toString(), user.id(),
-                UUID.randomUUID().toString(), clock.instant().plus(refreshLifetime), false);
+                UUID.randomUUID().toString(), clock.instant().plus(refreshLifetime), clock.instant(), false);
         sessions.create(session);
         return new Login(tokens.issue(user, session), user);
     }
@@ -55,18 +56,20 @@ public final class AuthService {
     public Login refresh(String token) {
         Claims claims = tokens.readRefresh(token);
         AuthSession session = sessions.byId(claims.sessionId()).orElseThrow(AuthFailure::unauthorized);
-        if (!session.usableAt(clock.instant()) || !session.userId().equals(claims.userId())
-                || !session.refreshId().equals(claims.refreshId())) throw AuthFailure.unauthorized();
+        if (!session.userId().equals(claims.userId()) || !session.refreshId().equals(claims.refreshId())) throw AuthFailure.unauthorized();
+        if (!session.usableAt(clock.instant(), inactivityTimeout)) { sessions.revoke(session.id(), session.userId()); throw AuthFailure.unauthorized(); }
         User user = users.byId(session.userId()).filter(User::active).orElseThrow(AuthFailure::unauthorized);
         String next = UUID.randomUUID().toString();
         if (!sessions.rotate(session.id(), claims.refreshId(), next, clock.instant())) throw AuthFailure.unauthorized();
         return new Login(tokens.issue(user, new AuthSession(session.id(), user.id(), next,
-                session.expiresAt(), false)), user);
+                session.expiresAt(), clock.instant(), false)), user);
     }
 
     public User identity(Long userId, String sessionId) {
         AuthSession session = sessions.byId(sessionId).orElseThrow(AuthFailure::unauthorized);
-        if (!session.userId().equals(userId) || !session.usableAt(clock.instant())) throw AuthFailure.unauthorized();
+        if (!session.userId().equals(userId)) throw AuthFailure.unauthorized();
+        if (!session.usableAt(clock.instant(), inactivityTimeout)) { sessions.revoke(session.id(), userId); throw AuthFailure.unauthorized(); }
+        if (!sessions.touch(session.id(), userId, clock.instant())) throw AuthFailure.unauthorized();
         return users.byId(userId).filter(User::active).orElseThrow(AuthFailure::unauthorized);
     }
 

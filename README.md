@@ -1,18 +1,5 @@
 # Proyecto FCV — Sistema ficticio de agendamiento de citas
 
-## Incrementos S2/S3 implementados
-
-El workspace ya incluye backend Spring Boot y frontend React para registro e inicio de sesión, renovaciones JWT y logout. La descripción de plantilla que sigue conserva el contexto original del curso.
-
-Desde PowerShell en esta carpeta: `./scripts/start-s2.ps1`.
-Frontend: http://localhost:5173. API health: http://localhost:8080/actuator/health.
-
-El overlay usa el esquema `citas_fcv_training` del volumen existente; consultar [README backend](citas-api/README.md) para otros entornos. No borra volúmenes ni modifica `.env`; el script genera secretos JWT locales en `.env.s2`, ignorado por Git.
-
-Ver [evidencia S2](citas-api/docs/wiki/llm-wiki/wiki/s2-evidencia.md), [wiki](citas-api/docs/wiki/llm-wiki/wiki/index.md) e [historias propuestas](citas-api/docs/wiki/scrum/README.md). Aprobación de historias y procedencia/aprobación visual del frontend pendientes. El Git raíz preexistente se conserva; operar cada repo con `git -C citas-api` o `git -C citas-web`.
-
-## Contexto original del paquete
-
 Plantilla de trabajo para las sesiones **S2 a S6** de la formación de agentes de desarrollo. El paquete deja deliberadamente **vacíos de lógica de negocio** los repositorios `citas-api` y `citas-web`: el objetivo es que cada estudiante los construya con agentes, especificaciones, pruebas y automatización, manteniendo evidencia mediante Git.
 
 > **Importante:** el dominio es académico. Las sedes y algunos nombres de especialidades se apoyan en información pública de FCV; pacientes, profesionales, credenciales, EPS, planes, horarios y citas son datos sintéticos. No representa sistemas ni procesos internos reales de FCV.
@@ -62,7 +49,7 @@ Node.js 24 LTS es el runtime/toolchain. **No se usa Express ni BFF.** El fronten
 La única LLM Wiki global se versionará dentro de:
 
 ```text
-citas-api/docs/wiki/llm-wiki/
+citas-api/docs/FCV Dev/llm-wiki/
 ```
 
 ## Skills incluidas

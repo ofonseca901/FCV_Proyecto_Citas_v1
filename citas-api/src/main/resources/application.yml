@@ -7,7 +7,7 @@ spring:
   application:
     name: citas-api
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:citas_fcv_training}?connectionTimeZone=UTC
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:citas_fcv_training}?connectionTimeZone=America/Bogota
     username: ${DB_USER:citas_app}
     password: ${DB_PASSWORD}
   jpa:
@@ -15,7 +15,7 @@ spring:
     hibernate:
       ddl-auto: validate
     properties:
-      hibernate.jdbc.time_zone: UTC
+      hibernate.jdbc.time_zone: America/Bogota
   flyway:
     enabled: true
   jackson:
@@ -36,3 +36,5 @@ app:
     refresh-secret: ${JWT_REFRESH_SECRET}
     access-minutes: ${JWT_ACCESS_MINUTES:15}
     refresh-days: ${JWT_REFRESH_DAYS:7}
+  session:
+    inactivity-minutes: ${SESSION_INACTIVITY_MINUTES:10}
