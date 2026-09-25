@@ -47,3 +47,74 @@ export interface Specialty extends Catalog { durationMinutes:number; general:boo
 export interface Availability { professionalId:number; locationId:number; professionalCode:string; firstName:string; lastName:string; startAt:string; durationMinutes:number }
 export interface Booking { professionalId:number; locationId:number; specialtyId:number; startAt:string }
 export interface RequestedAppointment { id:number; scheduledStartAt:string; patientFirstName:string; patientLastName:string; professionalCode:string; specialty:string; location:string }
+
+export interface AppointmentSummary {
+  id: number;
+  scheduledStartAt: string;
+  scheduledEndAt: string;
+  status: string;
+  rejectionReason?: string | null;
+  professionalId?: number;
+  locationId?: number;
+  specialtyId?: number;
+  professionalCode: string;
+  specialty: string;
+  location: string;
+  durationMinutes: number;
+}
+
+export interface RescheduleRequest {
+  id: number;
+  appointmentId: number;
+  originalStartAt: string;
+  originalEndAt?: string;
+  newStartAt: string;
+  newEndAt?: string;
+  status: string;
+  professionalCode: string;
+  specialty: string;
+  location: string;
+  patientFirstName?: string;
+  patientLastName?: string;
+}
+
+export interface ProfessionalAppointment {
+  id: number;
+  scheduledStartAt: string;
+  scheduledEndAt: string;
+  status: string;
+  patientFirstName: string;
+  patientLastName: string;
+  specialty: string;
+  location: string;
+}
+
+export interface StatusHistoryEvent {
+  id: number;
+  status: string;
+  source: string;
+  reason?: string | null;
+  changedAt: string;
+}
+
+export interface RescheduleBooking { startAt: string }
+
+export const s4Api = {
+  appointments: (token: string, status?: string, date?: string) => {
+    const query = new URLSearchParams();
+    if (status && status !== 'ALL') query.set('status', status);
+    if (date) query.set('date', date);
+    return request<AppointmentSummary[]>(`/appointments/mine${query.size ? `?${query}` : ''}`, undefined, token, '/api');
+  },
+  cancel: (token: string, id: number, reason?: string) => request<void>(`/appointments/${id}/cancel`, reason ? { reason } : {}, token, '/api'),
+  reschedule: (token: string, id: number, data: RescheduleBooking) => request<{ id: number }>(`/appointments/${id}/reschedule`, data, token, '/api'),
+  history: (token: string, id: number) => request<StatusHistoryEvent[]>(`/appointments/${id}/history`, undefined, token, '/api'),
+  professionalAgenda: (token: string, date: string, locationId?: number) => {
+    const query = new URLSearchParams({ date });
+    if (locationId) query.set('locationId', String(locationId));
+    return request<ProfessionalAppointment[]>(`/professional/appointments?${query}`, undefined, token, '/api');
+  },
+  closeAppointment: (token: string, id: number, status: 'COMPLETED' | 'NO_SHOW') => request<void>(`/professional/appointments/${id}/close`, { status }, token, '/api'),
+  pendingReschedules: (token: string) => request<RescheduleRequest[]>('/admin/reschedules/pending', undefined, token, '/api'),
+  decideReschedule: (token: string, id: number, approve: boolean, reason?: string) => request<void>(`/admin/reschedules/${id}/decision`, { approve, reason }, token, '/api'),
+};
